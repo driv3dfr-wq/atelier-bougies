@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex">
+<title>Atelier bougies</title>
+<style>
+  :root{
+    --paper:#FBF6EC; --card:#FFFDF8; --ink:#1C2533; --soft:#6E6A63; --line:#E6DCC8;
+    --night:#16233B; --night2:#24365A; --gold:#D9A441; --gold-soft:#F6E7CF; --rose:#C8574B; --green:#2F7A4C;
+    --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.45; }
+  button{ font-family:inherit; cursor:pointer; }
+  input, select, textarea{ font-family:inherit; font-size:16px; color:var(--ink); }
+  .hero{ background:radial-gradient(ellipse at 50% 120%, #3B4F7A 0%, var(--night2) 35%, var(--night) 75%); color:#fff; text-align:center; padding:30px 16px 36px; }
+  .hero .kicker{ font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; color:var(--gold); font-weight:700; }
+  .hero h1{ font-family:var(--serif); font-size:clamp(1.8rem, 7vw, 2.6rem); margin:6px 0 4px; line-height:1.1; }
+  .hero .host{ color:#C9D3E6; font-size:.95rem; }
+  .wrap{ max-width:720px; margin:0 auto; padding:0 16px 130px; }
+  .facts{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:10px; margin:-20px 0 16px; position:relative; }
+  .fact{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:10px 14px; box-shadow:0 6px 18px rgba(22,35,59,.08); }
+  .fact .l{ font-size:.64rem; letter-spacing:.12em; text-transform:uppercase; color:var(--soft); font-weight:700; }
+  .fact .v{ font-weight:700; margin-top:2px; }
+  .msg{ font-family:var(--serif); font-size:1.05rem; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:14px; white-space:pre-line; }
+  .note{ background:var(--gold-soft); color:#6B4512; border-radius:12px; padding:10px 14px; font-size:.9rem; margin-bottom:14px; }
+  .note.ok{ background:#DDEFE3; color:var(--green); }
+  .note.bad{ background:#F8DEDA; color:#8A2E24; }
+  h2.sec{ font-family:var(--serif); font-size:1.4rem; margin:26px 0 4px; }
+  .sub{ color:var(--soft); font-size:.88rem; margin-bottom:12px; }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:14px; }
+  .fld{ display:block; margin-bottom:12px; }
+  .fld > span{ display:block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); margin-bottom:5px; }
+  .fld input, .fld textarea{ width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:#FFFEFB; }
+  .fld textarea{ min-height:60px; resize:vertical; }
+  .chead{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .chead .num{ width:30px; height:30px; border-radius:50%; background:var(--night); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; flex:none; }
+  .chead .t{ font-weight:800; flex:1; }
+  .chead button{ border:none; background:transparent; color:var(--soft); font-size:.85rem; text-decoration:underline; }
+  .molds{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px; }
+  .mold{ position:relative; border:2px solid var(--line); border-radius:14px; background:#fff; padding:0; text-align:left; overflow:hidden; display:flex; flex-direction:column; }
+  .mold .ph{ height:104px; background:var(--gold-soft); display:flex; align-items:center; justify-content:center; font-size:2.4rem; }
+  .mold .ph img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .mold .nm{ font-weight:700; font-size:.88rem; padding:7px 9px 2px; }
+  .mold .st{ font-size:.74rem; color:var(--soft); padding:0 9px 8px; }
+  .mold.on{ border-color:var(--gold); box-shadow:0 0 0 3px rgba(217,164,65,.3); }
+  .mold.on::after{ content:"✓"; position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:50%; background:var(--gold); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .mold.taken{ opacity:.5; cursor:not-allowed; }
+  .mold.taken .ph{ filter:grayscale(1); }
+  .mold.taken .st{ color:var(--rose); font-weight:700; }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ border:2px solid var(--line); background:#fff; border-radius:999px; padding:8px 14px 8px 8px; font-weight:600; font-size:.92rem; display:flex; align-items:center; gap:8px; }
+  .chip .dot{ width:24px; height:24px; border-radius:50%; border:1px solid rgba(0,0,0,.12); flex:none; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:800; color:#fff; text-shadow:0 0 3px rgba(0,0,0,.6); }
+  .chip small{ color:var(--soft); font-weight:500; }
+  .chip.on{ border-color:var(--gold); background:var(--gold-soft); }
+  .chip:disabled{ opacity:.45; }
+  .who{ display:flex; flex-wrap:wrap; gap:6px; }
+  .who span{ background:#fff; border:1px solid var(--line); border-radius:999px; padding:4px 10px; font-size:.84rem; }
+  .bar{ position:fixed; left:0; right:0; bottom:0; background:rgba(251,246,236,.96); border-top:1px solid var(--line); padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px)); }
+  .bar .in{ max-width:720px; margin:0 auto; display:flex; gap:10px; align-items:center; }
+  .bar .sum{ flex:1; font-size:.84rem; color:var(--soft); }
+  .btn{ border:none; border-radius:12px; padding:14px 18px; font-weight:800; font-size:1rem; background:var(--night); color:#fff; }
+  .btn.gold{ background:var(--gold); }
+  .btn.ghost{ background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .btn:disabled{ opacity:.5; }
+  .center{ text-align:center; padding:60px 16px; color:var(--soft); }
+  .live{ display:inline-flex; align-items:center; gap:6px; font-size:.78rem; color:#C9D3E6; margin-top:10px; }
+  .live i{ width:8px; height:8px; border-radius:50%; background:#6FD08C; display:inline-block; animation:pulse 1.6s infinite; }
+  .live.off i{ background:#E0796E; animation:none; }
+  @keyframes pulse{ 50%{ opacity:.3; } }
+  .toast{ position:fixed; left:50%; top:16px; transform:translateX(-50%); background:var(--night); color:#fff; padding:10px 16px; border-radius:10px; font-size:.9rem; z-index:20; opacity:0; transition:opacity .2s; pointer-events:none; max-width:90%; }
+  .toast.show{ opacity:1; }
+</style>
+</head>
+<body>
+<div id="root"><div class="center">Chargement de l'atelier…</div></div>
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+/* Page de choix des invités. Aucune donnée dans ce fichier : tout vient du lien (#a=…&db=…) et de la base en ligne. */
+const Q = new URLSearchParams(location.hash.slice(1) || location.search.slice(1));
+const AID = (Q.get("a")||"").replace(/[.#$\[\]\/]/g,"");
+const DB = (Q.get("db")||"").replace(/^https?:\/\//,"").replace(/[^A-Za-z0-9.\-]/g,"");
+const BASE = DB ? "https://"+DB+"/ateliers/"+encodeURIComponent(AID) : "";
+const ME_KEY = "bougies_moi_"+AID;
+let forOther = Q.get("new")==="1";
+let O = null, R = {}, myId = null, form = null, live = null, dirty = false, sending = false;
+
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function h(tag, props, ...kids){
+  const el = document.createElement(tag);
+  for(const [k,v] of Object.entries(props||{})){
+    if(v==null || v===false) continue;
+    if(k==="class") el.className = v; else if(k==="style") el.style.cssText = v;
+    else if(k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if(k==="value" || k==="checked" || k==="disabled") el[k] = v;
+    else el.setAttribute(k, v===true ? "" : v);
+  }
+  kids.flat(9).forEach(c=>{ if(c==null || c===false) return; el.append(c.nodeType ? c : document.createTextNode(String(c))); });
+  return el;
+}
+function toast(m){ const t = document.getElementById("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove("show"), 2600); }
+function arr(x){ return Array.isArray(x) ? x : x && typeof x==="object" ? Object.keys(x).sort((a,b)=>a-b).map(k=>x[k]) : []; }
+function fmtDate(s){ if(!s) return ""; const d = new Date(s+"T12:00:00"); return isNaN(d) ? s : d.toLocaleDateString("fr-FR",{ weekday:"long", day:"numeric", month:"long" }); }
+function newId(){ return "w"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+async function req(method, path, data){
+  const r = await fetch(BASE+path+".json", { method, body: data===undefined ? undefined : JSON.stringify(data) });
+  if(!r.ok) throw new Error("Erreur "+r.status);
+  return r.json();
+}
+
+/* Qui a quel moule : premier arrivé, premier servi, la 1re bougie de chacun avant les 2es */
+function allocation(exceptId){
+  const list = Object.entries(R).filter(([k,v])=>v && v.n && k!==exceptId).sort((a,b)=>(a[1].t||0)-(b[1].t||0));
+  const used = {}, owners = {}, lost = [];
+  const cap = id=>{ const m = O.molds.find(x=>x.id===id); return m ? (+m.cap||1) : 0; };
+  const max = list.reduce((a,[k,v])=>Math.max(a, arr(v.c).length), 0);
+  for(let i=0;i<max;i++) list.forEach(([k,v])=>{
+    const c = arr(v.c)[i]; if(!c || !c.mold) return;
+    if((used[c.mold]||0) < cap(c.mold)){ used[c.mold] = (used[c.mold]||0)+1; (owners[c.mold] = owners[c.mold]||[]).push(v.n); }
+    else lost.push({ id:k, i, mold:c.mold });
+  });
+  return { used, owners, lost, left: id => cap(id) - (used[id]||0) };
+}
+
+function loadForm(){
+  const mine = myId && R[myId];
+  form = mine ? { n:mine.n||"", c:arr(mine.c).map(c=>({ mold:c.mold||"", pens:arr(c.pens), note:c.note||"" })), f:arr(mine.f), m:mine.m||"" }
+              : { n:"", c:[{ mold:"", pens:[], note:"" }], f:[], m:"" };
+  if(!form.c.length) form.c.push({ mold:"", pens:[], note:"" });
+  dirty = false;
+}
+
+function render(){
+  const root = document.getElementById("root"), y = window.scrollY;
+  root.innerHTML = "";
+  if(!O){ root.append(h("div",{class:"center"},"Atelier introuvable. Vérifie le lien reçu.")); return; }
+  document.title = O.title || "Atelier bougies";
+  const A = allocation(myId);
+  const hero = h("div",{class:"hero"},
+    h("div",{class:"kicker"},"Atelier bougies"),
+    h("h1",{}, O.title||"Atelier bougies"),
+    O.host ? h("div",{class:"host"},"proposé par "+O.host) : null,
+    h("div",{class:"live"+(live===false?" off":"")}, h("i"), live===false ? "Connexion perdue, on réessaie…" : "Moules mis à jour en direct"));
+  root.append(hero);
+  const w = h("div",{class:"wrap"}); root.append(w);
+  const facts = [["Quand", (fmtDate(O.date)+(O.time?" à "+O.time:"")).trim()], ["Où", O.place], ["Bougies", "jusqu'à "+(O.maxCandles||1)+" par personne"]].filter(x=>x[1]);
+  w.append(h("div",{class:"facts"}, facts.map(([l,v])=>h("div",{class:"fact"}, h("div",{class:"l"},l), h("div",{class:"v"},v)))));
+  if(O.message) w.append(h("div",{class:"msg"}, O.message));
+  if(O.deadline) w.append(h("div",{class:"note"},"Merci de choisir avant le "+fmtDate(O.deadline)+". Premier arrivé, premier servi pour les moules !"));
+
+  const names = Object.values(R).filter(v=>v && v.n).sort((a,b)=>(a.t||0)-(b.t||0)).map(v=>v.n);
+  if(names.length) w.append(h("div",{class:"card"}, h("div",{class:"sub", style:"margin-bottom:6px"}, names.length+" personne"+(names.length>1?"s ont":" a")+" déjà choisi"), h("div",{class:"who"}, names.map(n=>h("span",{},n)))));
+
+  if(O.closed){ w.append(h("div",{class:"note"},"Les choix sont clos. Merci !")); return; }
+
+  if(myId && R[myId] && !forOther){
+    const lostMine = allocation(null).lost.filter(x=>x.id===myId);
+    w.append(h("div",{class:"note "+(lostMine.length?"bad":"ok")}, lostMine.length
+      ? "⚠ Quelqu'un a pris un de tes moules juste avant toi. Choisis-en un autre ci-dessous puis enregistre."
+      : "✓ Tes choix sont enregistrés. Tu peux les modifier ici tant que les choix sont ouverts."));
+  }
+  if(forOther) w.append(h("div",{class:"note"},"Tu remplis les choix pour une autre personne."));
+
+  w.append(h("div",{class:"card"}, h("label",{class:"fld"}, h("span",{},"Ton prénom"),
+    h("input",{ value:form.n, maxlength:40, placeholder:"Prénom", autocomplete:"given-name", oninput:e=>{ form.n = e.target.value; dirty = true; } }))));
+
+  // Moules
+  w.append(h("h2",{class:"sec"},"Tes moules"));
+  w.append(h("div",{class:"sub"},"Un moule grisé est déjà pris. Ceux qui restent se mettent à jour en direct."));
+  form.c.forEach((c,i)=>{
+    const card = h("div",{class:"card"});
+    card.append(h("div",{class:"chead"}, h("span",{class:"num"}, i+1), h("span",{class:"t"},"Bougie "+(i+1)),
+      i>0 ? h("button",{ onclick:()=>{ form.c.splice(i,1); dirty = true; render(); } },"Retirer") : null));
+    const g = h("div",{class:"molds"});
+    O.molds.forEach(m=>{
+      const mineElsewhere = form.c.filter((x,j)=>j!==i && x.mold===m.id).length;
+      const left = A.left(m.id) - mineElsewhere, on = c.mold===m.id, taken = !on && left<=0;
+      const who = (A.owners[m.id]||[]);
+      const st = on ? "Ton choix" : taken ? "Pris"+(who.length?" par "+who.join(", "):"") : (m.cap>1 ? left+" place"+(left>1?"s":"")+" libre"+(left>1?"s":"") : "Libre");
+      const ph = h("div",{class:"ph"}, m.photo ? h("img",{ src:m.photo, alt:"", loading:"lazy" }) : (m.emoji||"🕯️"));
+      g.append(h("button",{ type:"button", class:"mold"+(on?" on":"")+(taken?" taken":""), disabled: taken || null, title:m.note||"",
+        onclick:()=>{ c.mold = on ? "" : m.id; dirty = true; render(); } }, ph, h("div",{class:"nm"}, m.name), h("div",{class:"st"}, st)));
+    });
+    card.append(g);
+    if(O.pens && O.pens.length){
+      card.append(h("div",{class:"sub", style:"margin:12px 0 6px"},"Déco au stylo après démoulage (facultatif)"));
+      card.append(h("div",{class:"chips"}, O.pens.map(p=>{ const on = c.pens.includes(p.id);
+        return h("button",{ type:"button", class:"chip"+(on?" on":""), onclick:()=>{ c.pens = on ? c.pens.filter(x=>x!==p.id) : c.pens.concat([p.id]); dirty = true; render(); } }, h("span",{class:"dot", style:"background:"+(p.hex||"#ccc")}), p.name); })));
+    }
+    card.append(h("label",{class:"fld", style:"margin:12px 0 0"}, h("span",{},"Une idée, un détail ? (facultatif)"),
+      h("input",{ value:c.note, maxlength:120, oninput:e=>{ c.note = e.target.value; dirty = true; } })));
+    w.append(card);
+  });
+  if(form.c.length < (O.maxCandles||1)) w.append(h("button",{ class:"btn ghost", style:"width:100%;margin-bottom:6px", onclick:()=>{ form.c.push({ mold:"", pens:[], note:"" }); dirty = true; render(); } },"+ Une bougie de plus"));
+
+  // Parfums
+  const pick = Math.min(O.pick||3, (O.frags||[]).length);
+  if(pick){
+    w.append(h("h2",{class:"sec"}, pick>1 ? "Tes "+pick+" parfums préférés" : "Ton parfum préféré"));
+    w.append(h("div",{class:"sub"}, pick>1 ? "Touche-les dans ton ordre de préférence. Chaque parfum a sa couleur : ta bougie aura l'un d'eux, celui qui permet de couler le plus de bougies ensemble." : "Chaque parfum a sa couleur."));
+    w.append(h("div",{class:"card"}, h("div",{class:"chips"}, O.frags.map(f=>{
+      const rank = form.f.indexOf(f.id), on = rank>=0;
+      return h("button",{ type:"button", class:"chip scent"+(on?" on":""), disabled: !on && form.f.length>=pick || null,
+        onclick:()=>{ form.f = on ? form.f.filter(x=>x!==f.id) : form.f.concat([f.id]); dirty = true; render(); } },
+        h("span",{class:"dot", style:"background:"+(f.hex||"#eee")}, on ? rank+1 : ""), h("span",{}, f.name, " ", h("small",{}, f.col && f.col!=="naturel" ? "· "+f.col : "· naturel")));
+    })), h("div",{class:"sub", style:"margin:10px 0 0"}, form.f.length+" / "+pick+" choisi"+(form.f.length>1?"s":""))));
+  }
+  w.append(h("div",{class:"card"}, h("label",{class:"fld", style:"margin:0"}, h("span",{},"Un mot pour l'organisateur (facultatif)"),
+    h("textarea",{ maxlength:300, oninput:e=>{ form.m = e.target.value; dirty = true; } }, form.m))));
+  w.append(h("button",{ class:"btn ghost", style:"width:100%;margin-top:4px", onclick:()=>{ forOther = true; myId = null; loadForm(); render(); window.scrollTo(0,0); } },"Remplir pour une autre personne"));
+
+  const nb = form.c.filter(c=>c.mold).length;
+  root.append(h("div",{class:"bar"}, h("div",{class:"in"},
+    h("div",{class:"sum"}, nb+" moule"+(nb>1?"s":"")+" · "+form.f.length+"/"+pick+" parfum"+(pick>1?"s":"")),
+    h("button",{ class:"btn gold", disabled: sending || null, onclick:send }, myId && R[myId] ? "Enregistrer" : "Valider mes choix"))));
+  window.scrollTo(0, y);
+}
+
+async function send(){
+  const pick = Math.min(O.pick||3, (O.frags||[]).length);
+  const name = form.n.trim();
+  if(!name) return toast("Indique ton prénom");
+  const c = form.c.filter(x=>x.mold);
+  if(!c.length) return toast("Choisis au moins un moule");
+  if(form.f.length < pick) return toast("Choisis "+pick+" parfums");
+  const id = myId || newId();
+  const A = allocation(id), seen = {};
+  for(const x of c){ seen[x.mold] = (seen[x.mold]||0)+1; if(A.left(x.mold) < seen[x.mold]){ const m = O.molds.find(y=>y.id===x.mold); return toast("« "+(m?m.name:"Ce moule")+" » vient d'être pris : choisis-en un autre"); } }
+  const old = R[id];
+  const data = { n:name, c:c.map(x=>({ mold:x.mold, pens:x.pens, note:x.note.trim() })), f:form.f, m:form.m.trim(),
+                 t: old && old.t ? old.t : { ".sv":"timestamp" }, u:{ ".sv":"timestamp" } };
+  sending = true; render();
+  try{
+    await req("PUT", "/responses/"+id, data);
+    myId = id;
+    if(!forOther) lsSet(ME_KEY, id);
+    await refresh();
+    dirty = false;
+    toast(forOther ? "Choix de "+name+" enregistrés ✓" : "Merci "+name+", c'est enregistré ✓");
+  }catch(e){ toast("⚠ Pas enregistré ("+e.message+"). Vérifie ta connexion et réessaie."); }
+  sending = false; render();
+}
+
+async function refresh(){
+  const d = await req("GET", "");
+  O = d && d.offer ? d.offer : null;
+  if(O){ O.molds = arr(O.molds); O.frags = arr(O.frags); O.pens = arr(O.pens); }
+  R = (d && d.responses) || {};
+}
+let pending = false;
+function softRender(){
+  const a = document.activeElement;
+  if(a && /INPUT|TEXTAREA/.test(a.tagName)){ pending = true; return; }   // ne pas fermer le clavier pendant la saisie
+  pending = false; render();
+}
+document.addEventListener("focusout", ()=>setTimeout(()=>{ if(pending) softRender(); }, 50));
+function listen(){
+  let t = null;
+  const pull = ()=>{ clearTimeout(t); t = setTimeout(async ()=>{ try{ R = (await req("GET","/responses")) || {}; live = true; if(!dirty && myId && R[myId]) loadForm(); softRender(); }catch(e){ live = false; } }, 300); };
+  document.addEventListener("visibilitychange", async ()=>{ if(document.visibilityState==="visible"){ try{ await refresh(); live = true; softRender(); }catch(e){} } });
+  try{
+    const es = new EventSource(BASE+"/responses.json");
+    es.addEventListener("put", pull); es.addEventListener("patch", pull);
+    es.onopen = ()=>{ if(live===false){ live = true; softRender(); } };
+    es.onerror = ()=>{ if(live!==false){ live = false; softRender(); } };
+  }catch(e){ setInterval(pull, 20000); }
+}
+
+(async function start(){
+  if(!AID || !DB){ document.getElementById("root").innerHTML = '<div class="center">Lien incomplet. Demande le lien à l\'organisateur.</div>'; return; }
+  myId = forOther ? null : lsGet(ME_KEY);
+  try{ await refresh(); live = true; }
+  catch(e){ document.getElementById("root").innerHTML = '<div class="center">Impossible de charger l\'atelier. Vérifie ta connexion puis recharge la page.</div>'; return; }
+  if(myId && !R[myId]) myId = null;
+  loadForm(); render(); listen();
+})();
+</script>
+</body>
+</html>
