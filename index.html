@@ -4290,10 +4290,10 @@ function renderPrep(){
   app.append(h("div",{class:"card", style:"border-left:4px solid var(--amber)"},
     h("h2",{},"📨 Comment ça marche"),
     h("ol",{style:"margin:0;padding-left:18px;font-size:.86rem;line-height:1.5"},
-      h("li",{},"Tu choisis ce que tu proposes (moules, techniques, couleurs, parfums) et tu notes tes invités."),
-      h("li",{},"Tu télécharges l'invitation (un fichier .html) et tu l'envoies par email en pièce jointe."),
-      h("li",{},"Chacun fait ses choix et appuie sur « Envoyer » : tu reçois un email avec un code."),
-      h("li",{},"Tu colles les emails ici : l'appli répartit les moules, signale les conflits et crée le projet de la journée."))));
+      h("li",{},"Crée ou ouvre un atelier ci-dessous, puis coche ce que tu proposes (moules, parfums) et donne une couleur à chaque parfum."),
+      h("li",{},"Dans la carte 🌐 Invitation en ligne, touche « Mettre l'invitation en ligne », puis « Envoyer le lien » (WhatsApp, SMS…)."),
+      h("li",{},"Chacun choisit ses moules et ses parfums préférés : les moules pris sont grisés en direct chez tout le monde."),
+      h("li",{},"Les choix arrivent ici tout seuls : l'appli répartit les moules, choisit les parfums et crée le projet de la journée."))));
   app.append(h("button",{class:"btn block", style:"margin-bottom:12px;padding:13px", onclick:()=>{ const x = newInvite(); state.invites.push(x); state.ui.inviteEditing = x.id; saveNow(); render(); window.scrollTo(0,0); }},"+ Nouvel atelier à préparer"));
   if(!state.invites.length){ app.append(h("div",{class:"card empty"}, h("span",{class:"ic"},"💌"), "Aucune invitation pour l'instant.")); return; }
   state.invites.slice().sort((a,b)=>(b.date||b.created||"").localeCompare(a.date||a.created||"")).forEach(x=>{
