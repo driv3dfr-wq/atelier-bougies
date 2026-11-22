@@ -3942,6 +3942,7 @@ function renderMoldProject(){
 function renderSettings(){
   setHeader("Réglages","Matériel, dosages, temps et sauvegarde");
   const S = state.settings;
+  app.append(onlineSettingsCard(false));
   const mLabel = h("span",{}, "Marge de perte : "+num(S.margin,1)+" %");
   app.append(h("div",{class:"card"},
     h("h2",{},"Matériel"),
@@ -4294,6 +4295,7 @@ function renderPrep(){
       h("li",{},"Dans la carte 🌐 Invitation en ligne, touche « Mettre l'invitation en ligne », puis « Envoyer le lien » (WhatsApp, SMS…)."),
       h("li",{},"Chacun choisit ses moules et ses parfums préférés : les moules pris sont grisés en direct chez tout le monde."),
       h("li",{},"Les choix arrivent ici tout seuls : l'appli répartit les moules, choisit les parfums et crée le projet de la journée."))));
+  app.append(onlineSettingsCard(true));
   app.append(h("button",{class:"btn block", style:"margin-bottom:12px;padding:13px", onclick:()=>{ const x = newInvite(); state.invites.push(x); state.ui.inviteEditing = x.id; saveNow(); render(); window.scrollTo(0,0); }},"+ Nouvel atelier à préparer"));
   if(!state.invites.length){ app.append(h("div",{class:"card empty"}, h("span",{class:"ic"},"💌"), "Aucune invitation pour l'instant.")); return; }
   state.invites.slice().sort((a,b)=>(b.date||b.created||"").localeCompare(a.date||a.created||"")).forEach(x=>{
@@ -4851,13 +4853,7 @@ function onlineCard(inv){
   const S = state.settings;
   const card = h("div",{class:"card", style:"border-left:4px solid var(--blue)"}, h("h2",{},"🌐 Invitation en ligne (choix en direct)"));
   const ready = fbBase() && siteBase();
-  if(!ready || state.ui.onlineSetup){
-    card.append(h("div",{class:"muted small", style:"margin-bottom:8px"},"Réglage à faire une seule fois. Ces adresses restent dans ce navigateur, elles ne sont pas dans le code publié."));
-    card.append(field("Adresse de ta base Firebase", inp(S,"fbUrl",{ type:"url", ph:"https://…firebasedatabase.app", cls:"plain" })));
-    card.append(field("Adresse de ton site GitHub Pages", inp(S,"siteUrl",{ type:"url", ph: siteBase() || "https://ton-pseudo.github.io/atelier-bougies/", cls:"plain" })));
-    card.append(h("button",{class:"btn block", onclick:()=>{ state.ui.onlineSetup = false; saveNow(); rerender(); }},"Enregistrer"));
-    return card;
-  }
+  if(!ready || /console\.firebase/i.test(S.fbUrl||"") || state.ui.onlineSetup) return onlineSettingsCard(false);
   if(inv.onlineAt) onlineWatch(inv);
   const link = onlineLink(inv);
   if(inv.onlineAt){
@@ -4877,7 +4873,24 @@ function onlineCard(inv){
     card.append(h("div",{class:"muted small", style:"margin-bottom:8px"},"Tes invités ouvrent un lien, choisissent leurs moules et "+(+inv.pickScents||3)+" parfums. Les moules pris s'affichent en direct chez tout le monde, et leurs choix arrivent ici tout seuls."));
     card.append(h("button",{class:"btn amber block", style:"padding:13px", onclick:()=>onlinePublish(inv)},"🌐 Mettre l'invitation en ligne"));
   }
-  card.append(h("button",{class:"btn ghost sm", style:"margin-top:8px", onclick:()=>{ state.ui.onlineSetup = true; rerender(); }},"⚙ Adresses (base, site)"));
+  return card;
+}
+
+/* ---------- Réglage unique des adresses en ligne (Réglages + liste de Préparation) ---------- */
+function onlineSettingsCard(compact){
+  const S = state.settings;
+  const bad = /console\.firebase/i.test(S.fbUrl||"");
+  const ok = fbBase() && siteBase() && !bad;
+  if(compact && ok && !state.ui.onlineSetup) return h("div",{class:"row muted small", style:"margin:0 0 10px"},
+    h("span",{class:"grow"},"🌐 Invitation en ligne réglée pour tous les ateliers"),
+    h("button",{class:"btn ghost sm", onclick:()=>{ state.ui.onlineSetup = true; rerender(); }},"⚙ Modifier"));
+  const card = h("div",{class:"card", style:"border-left:4px solid var(--blue)"}, h("h2",{},"🌐 Invitation en ligne"),
+    h("div",{class:"muted small", style:"margin-bottom:8px"},"À régler une seule fois, valable pour tous les ateliers. Ces adresses restent dans ce navigateur, elles ne sont pas dans le code publié."));
+  card.append(field("Adresse de ta base Firebase", inp(S,"fbUrl",{ type:"url", ph:"https://…firebasedatabase.app", cls:"plain" })));
+  if(bad) card.append(h("div",{class:"warn"},"⚠ C'est le lien de la console. Il faut l'adresse affichée en haut de la page « Données » de Realtime Database (elle se termine par firebasedatabase.app ou firebaseio.com)."));
+  card.append(field("Adresse du site", inp(S,"siteUrl",{ type:"url", ph: siteBase() || "https://ton-pseudo.github.io/atelier-bougies/", cls:"plain" })));
+  if(!S.siteUrl && siteBase()) card.append(h("div",{class:"muted small", style:"margin:-4px 0 8px"},"Vide = adresse actuelle : "+siteBase()));
+  card.append(h("button",{class:"btn block", onclick:()=>{ state.ui.onlineSetup = false; saveNow(); rerender(); toast(fbBase() && !/console\.firebase/i.test(S.fbUrl||"") ? "Adresses enregistrées ✓" : "⚠ Adresse de la base à vérifier"); }},"Enregistrer"));
   return card;
 }
 
